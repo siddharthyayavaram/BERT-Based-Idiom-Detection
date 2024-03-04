@@ -1,6 +1,7 @@
 # BERT-based Idiom Identification using Language Translation and Word Cohesion
 
-This repository is intended to provide a collection of the most important files related to "BERT-based Idiom Identification using Language Translation and Word Cohesion".
+This repository is intended to provide a collection of the most important files related to 
+### "BERT-based Idiom Identification using Language Translation and Word Cohesion".
 
 ## src Directory
 
