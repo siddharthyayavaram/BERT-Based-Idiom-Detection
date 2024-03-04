@@ -2,7 +2,7 @@
 
 This repository is intended to provide a collection of the most important files related to "BERT-based Idiom Identification using Language Translation and Word Cohesion".
 
-## Code Directory
+## src Directory
 
 ### Jupyter Notebooks:
 
@@ -22,12 +22,12 @@ This folder contains subfolders containing the files for the 'formal', 'magpie',
 ## Datasets
 
 The datasets can be acquired as follows :
-*Note:some additional preprocessing will be required to match our task*:
+
+*Note : some additional preprocessing will be required to match our task*
 
 1. magpie : https://github.com/hslh/magpie-corpus
 2. VNC : http://www.natcorp.ox.ac.uk/
 3. theidioms : Extracted and preprocessed using the `scrape.ipynb` notebook.
 4. formal : https://github.com/prateeksaxena2809/EPIE_Corpus
 
-*Note: Some files may not be available here due to reasons such as file size constraints and sensitivity.*
-
+*Note : Some files may not be available here due to reasons such as file size constraints and sensitivity.*
