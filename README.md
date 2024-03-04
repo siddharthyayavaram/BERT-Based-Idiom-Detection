@@ -19,6 +19,8 @@ This repository is intended to provide a collection of the most important files 
 
 This folder contains subfolders containing the files for the 'formal', 'magpie', and 'vnc' datasets for which Error Analysis and Semantic Accuracy computation is performed.
 
+## Datasets
+
 The datasets can be acquired as follows :
 *Note:some additional preprocessing will be required to match our task*:
 
