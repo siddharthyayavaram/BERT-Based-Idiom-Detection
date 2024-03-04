@@ -22,7 +22,8 @@ This folder contains subfolders containing the files for the 'formal', 'magpie',
 ## Datasets
 
 The datasets can be acquired as follows :
-*Note:some additional preprocessing will be required to match our task*:
+
+*Note:some additional preprocessing will be required to match our task*
 
 1. magpie : https://github.com/hslh/magpie-corpus
 2. VNC : http://www.natcorp.ox.ac.uk/
