@@ -1,0 +1,86 @@
+Error analysis for EPIE Formal Dataset
+(Test set has 315 examples)
+
+Error types:
+
+1. Getting correct but predicting extra : The entire idiomatic expression is tagged correctly, but it is also tagging extra in an alternate location
+2. Completely Wrong : Predicting another expression as an idiom [1 particular example has 500 tokens and is completely wrong in all cases]
+-- there are examples where the idiom is repeated, but the incorrect instance is being tagged instead
+3. Predicting Extra : Predicting the correct idiomatic tokens + tokens surrounding the idiom
+4. Predicting Partial : Partially predicts the idiomatic tags
+5. Predicting nothing : Predicting no tokens as idiomatic even when idiom is present
+6. Partial Correct and extra wrong : Predicting the idiomatic part partially correctly, but also tagging alternate parts as idiomatic
+
+Experiments and Results:
+
+a) Base
+number of incorrect samples - 64/315
+Sequence Accuracy - 79.68
+
+1.Getting correct but predicting extra - 25
+
+2.Completely wrong - 6
+
+3.Predicting extra - 10
+
+4.Predicting partial - 6
+
+5.Predicting nothing - 7
+
+6.Partial correct and extra wrong - 10
+
+
+b) Cohesion
+number of incorrect samples - 37/315
+Sequence Accuracy - 88.25
+
+1.Getting correct but predicting extra - 16
+
+2.Completely wrong - 5
+
+3.Predicting extra - 11
+
+4.Predicting partial - 4
+
+5.Predicting nothing - 1
+
+6.Partial correct and extra wrong - 10
+
+
+c) Translate
+
+number of incorrect samples - 31/315
+Sequence Accuracy - 90.15
+
+1.Getting correct but predicting extra - 9
+
+2.Completely wrong - 6
+
+3.Predicting extra - 8
+
+4.Predicting partial - 2
+
+5.Predicting nothing - 1
+
+6.Partial correct and extra wrong - 5
+
+
+d) Combine
+
+number of incorrect samples - 29/315
+Sequence Accuracy - 90.79
+
+1.Getting correct but predicting extra - 11
+
+2.Completely wrong - 6
+
+3.Predicting extra - 5
+
+4.Predicting partial - 2
+
+5.Predicting nothing - 1
+
+6.Partial correct and extra wrong - 4
+
+
+

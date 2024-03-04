@@ -1,0 +1,73 @@
+Error analysis for VNC Corpus
+(Test set has 256 examples)
+
+Error types:
+
+1. Getting correct but predicting extra : The entire idiomatic expression is tagged correctly, but it is also tagging extra in an alternate location
+2. Literal : The prediction is tagging an idiom but it is being used in a literal sense here
+3. Predicting Extra : Predicting the correct idiomatic tokens + tokens surrounding the idiom
+4. Predicting Partial : Partially predicts the idiomatic tags
+5. Predicting nothing : Predicting no tokens as idiomatic even when idiom is present
+
+Experiments and Results:
+
+a) Base
+number of incorrect samples - 16/256
+Sequence Accuracy - 93.75
+
+1.Getting correct but predicting extra - 4
+
+2.Literal - 4
+
+3.Predicting extra - 1
+
+4.Predicting partial - 3
+
+5.Predicting nothing - 4
+
+
+b) Cohesion
+number of incorrect samples - 8/256
+Sequence Accuracy - 96.88
+
+1.Getting correct but predicting extra - 
+
+2.Literal - 3
+
+3.Predicting extra - 
+
+4.Predicting partial - 2
+
+5.Predicting nothing - 3
+
+
+c) Translate
+
+number of incorrect samples - 8/256
+Sequence Accuracy - 96.88
+
+1.Getting correct but predicting extra - 2
+
+2.Literal - 2
+
+3.Predicting extra - 
+
+4.Predicting partial - 2
+
+5.Predicting nothing - 2
+
+
+d) Combine
+
+number of incorrect samples - 8/256
+Sequence Accuracy - 96.88
+
+1.Getting correct but predicting extra - 2
+
+2.Literal - 2
+
+3.Predicting extra - 
+
+4.Predicting partial - 2
+
+5.Predicting nothing - 2
