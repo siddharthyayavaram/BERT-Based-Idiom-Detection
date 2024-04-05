@@ -30,5 +30,3 @@ The datasets can be acquired as follows :
 2. VNC : http://www.natcorp.ox.ac.uk/
 3. theidioms : Extracted and preprocessed using the `scrape.ipynb` notebook.
 4. formal : https://github.com/prateeksaxena2809/EPIE_Corpus
-
-*Note : Some files may not be available here due to reasons such as file size constraints and sensitivity.*
