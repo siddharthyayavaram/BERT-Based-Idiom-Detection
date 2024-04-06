@@ -1,8 +1,23 @@
 # BERT-based Idiom Identification using Language Translation and Word Cohesion
 
-This repository is intended to provide a collection of a few of the files related to the paper titled: 
+This repository is intended to provide a collection of the files related to the paper titled: 
 
 "BERT-based Idiom Identification using Language Translation and Word Cohesion".
+
+### About the Project
+
+In this paper, we propose using a BERT- based model fine-tuned with the custom objectives to improve the accuracy of detecting PIEs in text. Our custom loss functions capture two important properties (word cohesion and language translation) to distinguish PIEs from non-PIEs. We conducted several experiments on 7 datasets and showed that incorporating custom objectives while training the model leads to substantial gains.
+
+This paper has been accepted for publication at MWE-UD 2024, to be held in conjunction with LREC-COLING.
+
+### Built With
+
+Our code relies on the following resources/libraries:
+
+- PyTorch
+- Huggingface's Transformer
+- NLTK
+- spacy
 
 ## src Directory
 
@@ -22,7 +37,10 @@ This folder contains subfolders containing the files for the `formal`, `magpie`,
 
 ## Datasets
 
-The datasets are all publicly available and can be acquired as follows :
+1. `theidioms_sentences.txt`: A collection of 7830 sentences with idiomatic expressions. Each idiomatic expression appears in an average of 4.87 sentences. There are 1606 unique idioms present.
+2. `theidioms1_1_sentences.txt`: A collection of 1606 sentences where each sentence has a unique idiom.
+
+The remaining datasets are all publicly available and can be acquired as follows :
 
 *Note : some additional preprocessing will be required to exactly match our task*
 
