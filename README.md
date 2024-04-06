@@ -39,6 +39,7 @@ This folder contains subfolders containing the files for the `formal`, `magpie`,
 
 1. `theidioms_sentences.txt`: A collection of 7830 sentences with idiomatic expressions. Each idiomatic expression appears in an average of 4.87 sentences. There are 1606 unique idioms present.
 2. `theidioms1_1_sentences.txt`: A collection of 1606 sentences where each sentence has a unique idiom.
+3. `list_of_idioms.txt`: A list of all 1606 idiomatic expressions which appear in the above datasets.
 
 The remaining datasets are all publicly available and can be acquired as follows :
 
