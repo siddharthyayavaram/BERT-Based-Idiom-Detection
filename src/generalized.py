@@ -84,48 +84,20 @@ dataset_dict = DatasetDict({
 tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
 
 def tokenize_and_align_labels(examples, label_all_tokens=True):
-    """
-    Function to tokenize and align labels with respect to the tokens. This function is specifically designed for
-    Named Entity Recognition (NER) tasks where alignment of the labels is necessary after tokenization.
-
-    Parameters:
-    examples (dict): A dictionary containing the tokens and the corresponding NER tags.
-                     - "tokens": list of words in a sentence.
-                     - "ner_tags": list of corresponding entity tags for each word.
-
-    label_all_tokens (bool): A flag to indicate whether all tokens should have labels.
-                             If False, only the first token of a word will have a label,
-                             the other tokens (subwords) corresponding to the same word will be assigned -100.
-
-    Returns:
-    tokenized_inputs (dict): A dictionary containing the tokenized inputs and the corresponding labels aligned with the tokens.
-    """
     tokenized_inputs = tokenizer(examples["tokens"], truncation=True, is_split_into_words=True)
     labels = []
     for i, label in enumerate(examples["ner_tags"]):
         word_ids = tokenized_inputs.word_ids(batch_index=i)
-        # word_ids() => Return a list mapping the tokens
-        # to their actual word in the initial sentence.
-        # It Returns a list indicating the word corresponding to each token.
         previous_word_idx = None
         label_ids = []
-        # Special tokens like `<s>` and `<\s>` are originally mapped to None
-        # We need to set the label to -100 so they are automatically ignored in the loss function.
         for word_idx in word_ids:
             if word_idx is None:
                 # set –100 as the label for these special tokens
                 label_ids.append(-100)
-            # For the other tokens in a word, we set the label to either the current label or -100, depending on
-            # the label_all_tokens flag.
             elif word_idx != previous_word_idx:
-                # if current word_idx is != prev then its the most regular case
-                # and add the corresponding token
                 label_ids.append(label[word_idx])
             else:
-                # to take care of sub-words which have the same word_idx
-                # set -100 as well for them, but only if label_all_tokens == False
                 label_ids.append(label[word_idx] if label_all_tokens else -100)
-                # mask the subword representations after the first subword
 
             previous_word_idx = word_idx
         labels.append(label_ids)
@@ -160,23 +132,10 @@ labels = [label_list[i] for i in example["ner_tags"]]
 metric.compute(predictions=[labels], references=[labels])
 
 def compute_metrics(eval_preds):
-    """
-    Function to compute the evaluation metrics for Named Entity Recognition (NER) tasks.
-    The function computes precision, recall, F1 score and accuracy.
-
-    Parameters:
-    eval_preds (tuple): A tuple containing the predicted logits and the true labels.
-
-    Returns:
-    A dictionary containing the precision, recall, F1 score and accuracy.
-    """
     pred_logits, labels = eval_preds
 
     pred_logits = np.argmax(pred_logits, axis=2)
-    # the logits and the probabilities are in the same order,
-    # so we don’t need to apply the softmax
 
-    # We remove all the values where the label is -100
     predictions = [
         [label_list[eval_preds] for (eval_preds, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(pred_logits, labels)
@@ -239,10 +198,6 @@ def calculate_cohesion_score(context_words, idiom_words, model, tokenizer):
     # Filter out only nouns and verbs from context words
     filtered_context_words = filter_pos(context_words)
 
-    # filtered_context_words = context_words
-
-    # print(filtered_context_words)
-
     word_embeddings = {}
 
     # Get BERT embeddings for all filtered words in the context
@@ -259,11 +214,6 @@ def calculate_cohesion_score(context_words, idiom_words, model, tokenizer):
     # Calculate connectivity
     connectivity = np.mean(cohesion_graph)
 
-    # print(cohesion_graph)
-
-    # print(str(connectivity) + "1")
-
-    # Remove idiom words and recalculate connectivity
     idiom_indices = [filtered_context_words.index(word) for word in idiom_words if word in filtered_context_words]
 
     # print(idiom_indices)
@@ -272,9 +222,6 @@ def calculate_cohesion_score(context_words, idiom_words, model, tokenizer):
         cohesion_graph = np.delete(cohesion_graph, idiom_indices, axis=0)
         cohesion_graph = np.delete(cohesion_graph, idiom_indices, axis=1)
 
-        # print(cohesion_graph)
-
-        # Compare connectivity changes
         connectivity_without_idiom = np.mean(cohesion_graph)
 
         # print(str(connectivity_without_idiom)+"2")
@@ -307,10 +254,6 @@ def calculate_cohesion_score(context_words, idiom_words, model, tokenizer):
             # Calculate connectivity
             connectivity = np.mean(cohesion_graph)
 
-            # print(cohesion_graph)
-
-            # print(str(connectivity)+"3")
-
             # Remove idiom words and recalculate connectivity
             idiom_indices = [filtered_context_words.index(word) for word in idiom_words if word in filtered_context_words]
 
@@ -324,8 +267,6 @@ def calculate_cohesion_score(context_words, idiom_words, model, tokenizer):
 
                 # Compare connectivity changes
                 connectivity_without_idiom = np.mean(cohesion_graph)
-
-                # print(str(connectivity_without_idiom)+"4")
 
                 if connectivity_without_idiom > connectivity:
                     return 'idiom', connectivity, connectivity_without_idiom
@@ -353,8 +294,6 @@ def idiom_part(ip_ids,labels):
 
 from googletrans import Translator
 
-translator=Translator()
-
 from nltk.translate import meteor_score
 
 import nltk
@@ -377,7 +316,6 @@ def meteor(sen, max_retries=3, timeout_seconds=10):
             return meteor_score_value, sen, bsen
         except Exception as e:
             print(f"An error occurred during translation (Retry {retry + 1}/{max_retries}): {e}")
-            # Handle other exceptions if needed
             time.sleep(1)  # Add a delay before retrying
 
     print(f"Failed to translate after {max_retries} retries.")
@@ -501,7 +439,6 @@ for i,d in not_1.items():
 print(indices)
 print(len(indices))
 
-# Open a text file for writing
 with open("Error_Analysis_generalized.txt", "w") as file:
     # Iterate over indices
     for x in indices:

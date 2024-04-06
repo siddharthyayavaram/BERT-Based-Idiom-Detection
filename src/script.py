@@ -1,5 +1,4 @@
 from datasets import DatasetDict, Dataset
-
 import datasets
 import numpy as np
 from transformers import BertTokenizerFast
@@ -10,11 +9,11 @@ from sklearn.metrics import classification_report
 text_data = []
 tag_data = []
 
-with open('Formal_Idioms_Words.txt', 'r', encoding='utf-8') as file:
+with open('vnc_words.txt', 'r', encoding='utf-8') as file:
     # Read lines and remove newline characters
     text_data = [line.rstrip('\n').split() for line in file.readlines()]
 
-with open('Formal_Idioms_Tags.txt', 'r', encoding='utf-8') as file:
+with open('vnc_tags.txt', 'r', encoding='utf-8') as file:
     # Read lines and remove newline characters
     tag_data = [line.rstrip('\n').split() for line in file.readlines()]
 
@@ -26,7 +25,7 @@ def convert_tags_to_integers_list_1(list_of_tag_lists):
     tag_mapping = {'0': 0, '1': 1}
     return [[tag_mapping[tag] for tag in inner_list] for inner_list in list_of_tag_lists]
 
-tag_data = convert_tags_to_integers_list(tag_data)
+tag_data = convert_tags_to_integers_list_1(tag_data)
 
 import random
 
@@ -119,23 +118,9 @@ labels = [label_list[i] for i in example["ner_tags"]]
 metric.compute(predictions=[labels], references=[labels])
 
 def compute_metrics(eval_preds):
-    """
-    Function to compute the evaluation metrics for Named Entity Recognition (NER) tasks.
-    The function computes precision, recall, F1 score and accuracy.
-
-    Parameters:
-    eval_preds (tuple): A tuple containing the predicted logits and the true labels.
-
-    Returns:
-    A dictionary containing the precision, recall, F1 score and accuracy.
-    """
     pred_logits, labels = eval_preds
 
     pred_logits = np.argmax(pred_logits, axis=2)
-    # the logits and the probabilities are in the same order,
-    # so we don’t need to apply the softmax
-
-    # We remove all the values where the label is -100
     predictions = [
         [label_list[eval_preds] for (eval_preds, l) in zip(prediction, label) if l != -100]
         for prediction, label in zip(pred_logits, labels)
@@ -162,9 +147,6 @@ def compute_metrics(eval_preds):
     }
 
 import matplotlib.pyplot as plt
-
-losses_list = []
-
 import torch
 from transformers import BertTokenizer, BertModel
 import numpy as np
@@ -238,7 +220,6 @@ def calculate_cohesion_score(context_words, idiom_words, model, tokenizer):
             return 'literal', connectivity, connectivity_without_idiom
     else:
         # # Handle the case where no idiom words are found in the filtered context
-        # return 'cant embed so idiom'
 
             filtered_context_words = context_words
 
@@ -307,17 +288,27 @@ from nltk.translate import meteor_score
 import nltk
 nltk.download('wordnet')
 
-def meteor(example):
-    translator = Translator()
-    sen = example
-    translated_text = translator.translate(sen, dest='hi', timeout=10).text
-    back_translated_text = translator.translate(translated_text, dest='en', timeout=10).text
-    bsen = back_translated_text
-    r = [sen.split()]
-    c = bsen.split()
-    meteor_score_value = meteor_score.meteor_score(r, c)
+translator = Translator()
+import time
 
-    return meteor_score_value, sen, bsen
+def meteor(sen, max_retries=3, timeout_seconds=10):
+
+    for retry in range(max_retries):
+        try:
+            translated_text = translator.translate(sen, dest='hi', timeout=timeout_seconds).text
+            back_translated_text = translator.translate(translated_text, dest='en', timeout=timeout_seconds).text
+            bsen = back_translated_text
+            r = [sen.split()]
+            c = bsen.split()
+            meteor_score_value = meteor_score.meteor_score(r, c)
+
+            return meteor_score_value, sen, bsen
+        except Exception as e:
+            print(f"An error occurred during translation (Retry {retry + 1}/{max_retries}): {e}")
+            time.sleep(1)  # Add a delay before retrying
+
+    print(f"Failed to translate after {max_retries} retries.")
+    return 0, None, None
 
 class MyTrainer_Trans(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
@@ -352,7 +343,6 @@ class MyTrainer_Trans(Trainer):
         if b-a > 0.02:
             loss = loss*100
 
-        losses_list.append(loss)
         if return_outputs:
             return loss, outputs
         else:
@@ -442,8 +432,8 @@ for i,d in not_1.items():
 print(indices)
 print(len(indices))
 
-# Open a text file for writing
-with open("error_analysis_formal_combined_loss.txt", "w") as file:
+
+with open("err_analysis_vnc_comb.txt", "w") as file:
     # Iterate over indices
     for x in indices:
         prediction = predictions[x]
