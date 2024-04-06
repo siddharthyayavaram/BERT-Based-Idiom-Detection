@@ -10,13 +10,10 @@ from sklearn.metrics import classification_report
 text_data = []
 tag_data = []
 
-#theidioms dataset
 with open('sentences_fixed_1_wo.txt', 'r', encoding='utf-8') as file:
-    # Read lines and remove newline characters
     text_data = [line.rstrip('\n').split() for line in file.readlines()]
 
 with open('idiom_tags_fixed_1_wo.txt', 'r', encoding='utf-8') as file:           
-    # Read lines and remove newline characters
     tag_data = [line.rstrip('\n').split() for line in file.readlines()]
 
 test_text = []
@@ -24,11 +21,9 @@ test_tag = []
 
 #gtrans dataset
 with open('gtrans_sentences.txt', 'r', encoding='utf-8') as file:
-    # Read lines and remove newline characters
     test_text = [line.rstrip('\n').split() for line in file.readlines()]
 
 with open('gtrans_tags.txt', 'r', encoding='utf-8') as file:
-    # Read lines and remove newline characters
     test_tag = [line.rstrip('\n').split() for line in file.readlines()]
 
 
@@ -45,18 +40,15 @@ test_tag = convert_tags_to_integers_list_1(test_tag)
 
 import random
 
-# Calculate the split sizes
 total_samples = len(text_data)
 train_size = int(1 * total_samples)
 random.seed(42)
-# Shuffle the data
 combined_data = list(zip(text_data, tag_data))
 random.shuffle(combined_data)
 
 test_data_combined = list(zip(test_text,test_tag))
 random.shuffle(test_data_combined)
 
-# Separate the data into training, validation, and test sets
 train_data = combined_data
 
 a = int(0.4 * len(test_text))
@@ -64,17 +56,14 @@ a = int(0.4 * len(test_text))
 val_data = test_data_combined[:a]
 test_data = test_data_combined[a:]
 
-# Convert back to separate lists for tokens and ner_tags
 train_tokens, train_ner_tags = zip(*train_data)
 val_tokens, val_ner_tags = zip(*val_data)
 test_tokens, test_ner_tags = zip(*test_data)
 
-# Create the final dictionaries with ids starting from 0
 train = {"id": list(map(str, range(train_size))), "tokens": list(train_tokens), "ner_tags": list(train_ner_tags)}
 validation = {"id": list(map(str, range(a))), "tokens": list(val_tokens), "ner_tags": list(val_ner_tags)}
 test = {"id": list(map(str, range(len(test_text)-a))), "tokens": list(test_tokens), "ner_tags": list(test_ner_tags)}
 
-# Create a DatasetDict
 dataset_dict = DatasetDict({
     "train": Dataset.from_dict(train),
     "validation": Dataset.from_dict(validation),
@@ -114,8 +103,6 @@ model = AutoModelForTokenClassification.from_pretrained("bert-base-uncased", num
 
 # Check for GPU availability
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
-# Move the model to the GPU
 model = model.to(device)
 
 from transformers import TrainingArguments, Trainer
@@ -195,28 +182,21 @@ def filter_pos(words):
     return filtered_words
 
 def calculate_cohesion_score(context_words, idiom_words, model, tokenizer):
-    # Filter out only nouns and verbs from context words
     filtered_context_words = filter_pos(context_words)
 
     word_embeddings = {}
 
-    # Get BERT embeddings for all filtered words in the context
     for word in filtered_context_words:
         word_embeddings[word] = get_bert_embeddings(word, model, tokenizer)
 
     cohesion_graph = np.zeros((len(filtered_context_words), len(filtered_context_words)))
-
-    # Populate cohesion graph with semantic relatedness scores
     for i, word1 in enumerate(filtered_context_words):
         for j, word2 in enumerate(filtered_context_words):
             cohesion_graph[i, j] = compute_semantic_relatedness(word_embeddings[word1], word_embeddings[word2])
 
-    # Calculate connectivity
     connectivity = np.mean(cohesion_graph)
 
     idiom_indices = [filtered_context_words.index(word) for word in idiom_words if word in filtered_context_words]
-
-    # print(idiom_indices)
 
     if idiom_indices:
         cohesion_graph = np.delete(cohesion_graph, idiom_indices, axis=0)
@@ -224,48 +204,27 @@ def calculate_cohesion_score(context_words, idiom_words, model, tokenizer):
 
         connectivity_without_idiom = np.mean(cohesion_graph)
 
-        # print(str(connectivity_without_idiom)+"2")
-
         if connectivity_without_idiom > connectivity:
             return 'idiom', connectivity, connectivity_without_idiom
         else:
             return 'literal', connectivity, connectivity_without_idiom
     else:
-        # # Handle the case where no idiom words are found in the filtered context
-        # return 'cant embed so idiom'
-
             filtered_context_words = context_words
-
-            # print(filtered_context_words)
-
             word_embeddings = {}
-
-            # Get BERT embeddings for all filtered words in the context
             for word in filtered_context_words:
                 word_embeddings[word] = get_bert_embeddings(word, model, tokenizer)
 
             cohesion_graph = np.zeros((len(filtered_context_words), len(filtered_context_words)))
-
-            # Populate cohesion graph with semantic relatedness scores
             for i, word1 in enumerate(filtered_context_words):
                 for j, word2 in enumerate(filtered_context_words):
                     cohesion_graph[i, j] = compute_semantic_relatedness(word_embeddings[word1], word_embeddings[word2])
-
-            # Calculate connectivity
             connectivity = np.mean(cohesion_graph)
 
-            # Remove idiom words and recalculate connectivity
             idiom_indices = [filtered_context_words.index(word) for word in idiom_words if word in filtered_context_words]
-
-            # print(idiom_indices)
-
             if idiom_indices:
                 cohesion_graph = np.delete(cohesion_graph, idiom_indices, axis=0)
                 cohesion_graph = np.delete(cohesion_graph, idiom_indices, axis=1)
 
-                # print(cohesion_graph)
-
-                # Compare connectivity changes
                 connectivity_without_idiom = np.mean(cohesion_graph)
 
                 if connectivity_without_idiom > connectivity:
@@ -293,12 +252,9 @@ def idiom_part(ip_ids,labels):
     return tokenizer.decode(ip_ids.view(-1)).replace('[CLS]','').replace('[SEP]','').split(),tokenizer.decode(idiom_list).split()
 
 from googletrans import Translator
-
 from nltk.translate import meteor_score
-
 import nltk
 nltk.download('wordnet')
-
 translator = Translator()
 import time
 
@@ -316,7 +272,7 @@ def meteor(sen, max_retries=3, timeout_seconds=10):
             return meteor_score_value, sen, bsen
         except Exception as e:
             print(f"An error occurred during translation (Retry {retry + 1}/{max_retries}): {e}")
-            time.sleep(1)  # Add a delay before retrying
+            time.sleep(1)
 
     print(f"Failed to translate after {max_retries} retries.")
     return 0, None, None
@@ -363,12 +319,11 @@ args = TrainingArguments(
     learning_rate=2e-5,
     per_device_train_batch_size=1,
     per_device_eval_batch_size=1,
-    num_train_epochs=3,
+    num_train_epochs=5,
     weight_decay=0.01,
     seed = 42
 )
 
-# Create an instance of your custom trainer
 ner_trainer_trans = MyTrainer_Trans(
     model=model,
     args=args,
@@ -388,11 +343,7 @@ warnings.filterwarnings("ignore", category = RuntimeWarning)
 ner_trainer_trans.train()
 
 label_list = ['O', 'IDIOM']
-
-# Predict on the test dataset
 test_predictions = ner_trainer_trans.predict(tokenized_datasets["test"])
-
-# Extract predicted labels from test_predictions
 predicted_labels = test_predictions.predictions
 
 pred_logits = np.argmax(test_predictions.predictions, axis=2)
@@ -440,14 +391,13 @@ print(indices)
 print(len(indices))
 
 with open("Error_Analysis_generalized.txt", "w") as file:
-    # Iterate over indices
     for x in indices:
         prediction = predictions[x]
         tokens = tokenized_datasets["test"][x]['tokens']
-        labels = tokenized_datasets["test"][x]['labels'][1:-1]  # Ignore the first and last elements in labels
+        labels = tokenized_datasets["test"][x]['labels'][1:-1]
         max_length = max(len(tokens), len(labels))
         tokens += [''] * (max_length - len(tokens))
         labels += [''] * (max_length - len(labels))
         for token, label, pred in zip(tokens, labels, prediction):
             file.write(f"Prediction: {pred.ljust(10)} Token: {token.ljust(15)} Label: {label}\n")
-        file.write("\n")  # Add a newline to separate each entry
+        file.write("\n")

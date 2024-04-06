@@ -10,11 +10,9 @@ text_data = []
 tag_data = []
 
 with open('vnc_words.txt', 'r', encoding='utf-8') as file:
-    # Read lines and remove newline characters
     text_data = [line.rstrip('\n').split() for line in file.readlines()]
 
 with open('vnc_tags.txt', 'r', encoding='utf-8') as file:
-    # Read lines and remove newline characters
     tag_data = [line.rstrip('\n').split() for line in file.readlines()]
 
 def convert_tags_to_integers_list(list_of_tag_lists):
@@ -29,33 +27,27 @@ tag_data = convert_tags_to_integers_list_1(tag_data)
 
 import random
 
-# Calculate the split sizes
 total_samples = len(text_data)
 train_size = int(0.8 * total_samples)
 val_size = int(0.1 * total_samples)
 test_size = total_samples - train_size - val_size
 random.seed(42)
-# Shuffle the data
 combined_data = list(zip(text_data, tag_data))
 random.shuffle(combined_data)
 
-# Separate the data into training, validation, and test sets
 train_data = combined_data[:train_size]
 val_data = combined_data[train_size:train_size + val_size]
 x = train_size + val_size
 test_data = combined_data[x: x + test_size]
 
-# Convert back to separate lists for tokens and ner_tags
 train_tokens, train_ner_tags = zip(*train_data)
 val_tokens, val_ner_tags = zip(*val_data)
 test_tokens, test_ner_tags = zip(*test_data)
 
-# Create the final dictionaries with ids starting from 0
 train = {"id": list(map(str, range(train_size))), "tokens": list(train_tokens), "ner_tags": list(train_ner_tags)}
 validation = {"id": list(map(str, range(val_size))), "tokens": list(val_tokens), "ner_tags": list(val_ner_tags)}
 test = {"id": list(map(str, range(test_size))), "tokens": list(test_tokens), "ner_tags": list(test_ner_tags)}
 
-# Create a DatasetDict
 dataset_dict = DatasetDict({
     "train": Dataset.from_dict(train),
     "validation": Dataset.from_dict(validation),
@@ -75,15 +67,11 @@ def tokenize_and_align_labels(examples, label_all_tokens=True):
 
         for word_idx in word_ids:
             if word_idx is None:
-                # set –100 as the label for these special tokens
                 label_ids.append(-100)
-            # For the other tokens in a word, we set the label to either the current label or -100, depending on
-            # the label_all_tokens flag.
             elif word_idx != previous_word_idx:
                 label_ids.append(label[word_idx])
             else:
                 label_ids.append(label[word_idx] if label_all_tokens else -100)
-                # mask the subword representations after the first subword
 
             previous_word_idx = word_idx
         labels.append(label_ids)
@@ -98,10 +86,7 @@ tokenized_datasets = dataset_dict.map(tokenize_and_align_labels, batched=True)
 
 model = AutoModelForTokenClassification.from_pretrained("bert-base-uncased", num_labels=2)
 
-# Check for GPU availability
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
-# Move the model to the GPU
 model = model.to(device)
 
 from transformers import TrainingArguments, Trainer
@@ -168,7 +153,6 @@ def compute_semantic_relatedness(word1_embedding, word2_embedding):
     return cosine_similarity([word1_embedding], [word2_embedding])[0, 0]
 
 def filter_pos(words):
-    # Keep only nouns and verbs
     pos_tags_to_keep = ["NOUN", "VERB"]
     filtered_words = []
     for word in words:
@@ -180,7 +164,6 @@ def filter_pos(words):
     return filtered_words
 
 def calculate_cohesion_score(context_words, idiom_words, model, tokenizer):
-    # Filter out only nouns and verbs from context words
     filtered_context_words = filter_pos(context_words)
 
     word_embeddings = {}
@@ -200,61 +183,38 @@ def calculate_cohesion_score(context_words, idiom_words, model, tokenizer):
     connectivity = np.mean(cohesion_graph)
 
     idiom_indices = [filtered_context_words.index(word) for word in idiom_words if word in filtered_context_words]
-
-    # print(idiom_indices)
-
     if idiom_indices:
         cohesion_graph = np.delete(cohesion_graph, idiom_indices, axis=0)
         cohesion_graph = np.delete(cohesion_graph, idiom_indices, axis=1)
 
-        # print(cohesion_graph)
 
-        # Compare connectivity changes
         connectivity_without_idiom = np.mean(cohesion_graph)
-
-        # print(str(connectivity_without_idiom)+"2")
 
         if connectivity_without_idiom > connectivity:
             return 'idiom', connectivity, connectivity_without_idiom
         else:
             return 'literal', connectivity, connectivity_without_idiom
     else:
-        # # Handle the case where no idiom words are found in the filtered context
 
             filtered_context_words = context_words
-
-            # print(filtered_context_words)
-
             word_embeddings = {}
-
-            # Get BERT embeddings for all filtered words in the context
             for word in filtered_context_words:
                 word_embeddings[word] = get_bert_embeddings(word, model, tokenizer)
 
             cohesion_graph = np.zeros((len(filtered_context_words), len(filtered_context_words)))
 
-            # Populate cohesion graph with semantic relatedness scores
             for i, word1 in enumerate(filtered_context_words):
                 for j, word2 in enumerate(filtered_context_words):
                     cohesion_graph[i, j] = compute_semantic_relatedness(word_embeddings[word1], word_embeddings[word2])
-
-            # Calculate connectivity
             connectivity = np.mean(cohesion_graph)
 
             idiom_indices = [filtered_context_words.index(word) for word in idiom_words if word in filtered_context_words]
-
-            # print(idiom_indices)
 
             if idiom_indices:
                 cohesion_graph = np.delete(cohesion_graph, idiom_indices, axis=0)
                 cohesion_graph = np.delete(cohesion_graph, idiom_indices, axis=1)
 
-                # print(cohesion_graph)
-
-                # Compare connectivity changes
                 connectivity_without_idiom = np.mean(cohesion_graph)
-
-                # print(str(connectivity_without_idiom)+"4")
 
                 if connectivity_without_idiom > connectivity:
                     return 'idiom', connectivity, connectivity_without_idiom
@@ -280,14 +240,9 @@ def idiom_part(ip_ids,labels):
     return tokenizer.decode(ip_ids.view(-1)).replace('[CLS]','').replace('[SEP]','').split(),tokenizer.decode(idiom_list).split()
 
 from googletrans import Translator
-
-translator=Translator()
-
 from nltk.translate import meteor_score
-
 import nltk
 nltk.download('wordnet')
-
 translator = Translator()
 import time
 
@@ -305,16 +260,13 @@ def meteor(sen, max_retries=3, timeout_seconds=10):
             return meteor_score_value, sen, bsen
         except Exception as e:
             print(f"An error occurred during translation (Retry {retry + 1}/{max_retries}): {e}")
-            time.sleep(1)  # Add a delay before retrying
+            time.sleep(1)
 
     print(f"Failed to translate after {max_retries} retries.")
     return 0, None, None
 
 class MyTrainer_Trans(Trainer):
     def compute_loss(self, model, inputs, return_outputs=False):
-
-        # print("------------------------------------------------------------")
-
         ip_ids = inputs['input_ids']
         labels = inputs.pop("labels")
 
@@ -334,7 +286,6 @@ class MyTrainer_Trans(Trainer):
         outputs = model(**inputs)
         logits = outputs.logits
 
-        # Calculate the cross-entropy loss
         loss = torch.nn.functional.cross_entropy(logits.view(-1, logits.shape[-1]), labels.view(-1), ignore_index=-100)
 
         if y < 0.7:
@@ -348,8 +299,6 @@ class MyTrainer_Trans(Trainer):
         else:
             return loss
 
-
-# Example usage
 args = TrainingArguments(
     "test-ner",
     evaluation_strategy="epoch",
@@ -361,7 +310,6 @@ args = TrainingArguments(
     seed=42
 )
 
-# Create an instance of your custom trainer
 ner_trainer_trans = MyTrainer_Trans(
     model=model,
     args=args,
@@ -373,19 +321,15 @@ ner_trainer_trans = MyTrainer_Trans(
 )
 
 np.seterr(all='ignore')
-
 import warnings
-
 warnings.filterwarnings("ignore", category = RuntimeWarning)
 
 ner_trainer_trans.train()
 
+
+
 label_list = ['O', 'IDIOM']
-
-# Predict on the test dataset
 test_predictions = ner_trainer_trans.predict(tokenized_datasets["test"])
-
-# Extract predicted labels from test_predictions
 predicted_labels = test_predictions.predictions
 
 pred_logits = np.argmax(test_predictions.predictions, axis=2)
@@ -435,7 +379,6 @@ print(len(indices))
 
 # Writes the unaligned predictions into text files
 with open("err_analysis_vnc_comb.txt", "w") as file:
-    # Iterate over indices
     for x in indices:
         prediction = predictions[x]
         tokens = tokenized_datasets["test"][x]['tokens']
@@ -447,4 +390,4 @@ with open("err_analysis_vnc_comb.txt", "w") as file:
 
         for token, label, pred in zip(tokens, labels, prediction):
             file.write(f"Prediction: {pred.ljust(10)} Token: {token.ljust(15)} Label: {label}\n")
-        file.write("\n")  # Add a newline to separate each entry
+        file.write("\n")
