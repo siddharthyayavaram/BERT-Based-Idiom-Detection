@@ -433,19 +433,18 @@ print(indices)
 print(len(indices))
 
 
+# Writes the unaligned predictions into text files
 with open("err_analysis_vnc_comb.txt", "w") as file:
     # Iterate over indices
     for x in indices:
         prediction = predictions[x]
         tokens = tokenized_datasets["test"][x]['tokens']
-        labels = tokenized_datasets["test"][x]['labels'][1:-1]  # Ignore the first and last elements in labels
+        labels = tokenized_datasets["test"][x]['labels'][1:-1]
 
-        # Align tokens and labels
         max_length = max(len(tokens), len(labels))
         tokens += [''] * (max_length - len(tokens))
         labels += [''] * (max_length - len(labels))
 
-        # Write the aligned output to the file
         for token, label, pred in zip(tokens, labels, prediction):
             file.write(f"Prediction: {pred.ljust(10)} Token: {token.ljust(15)} Label: {label}\n")
         file.write("\n")  # Add a newline to separate each entry

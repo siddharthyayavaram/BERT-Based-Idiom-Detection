@@ -445,13 +445,9 @@ with open("Error_Analysis_generalized.txt", "w") as file:
         prediction = predictions[x]
         tokens = tokenized_datasets["test"][x]['tokens']
         labels = tokenized_datasets["test"][x]['labels'][1:-1]  # Ignore the first and last elements in labels
-
-        # Align tokens and labels
         max_length = max(len(tokens), len(labels))
         tokens += [''] * (max_length - len(tokens))
         labels += [''] * (max_length - len(labels))
-
-        # Write the aligned output to the file
         for token, label, pred in zip(tokens, labels, prediction):
             file.write(f"Prediction: {pred.ljust(10)} Token: {token.ljust(15)} Label: {label}\n")
         file.write("\n")  # Add a newline to separate each entry
