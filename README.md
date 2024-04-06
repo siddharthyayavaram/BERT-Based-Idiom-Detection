@@ -29,3 +29,13 @@ The datasets are all publicly available and can be acquired as follows :
 2. VNC : http://www.natcorp.ox.ac.uk/
 3. theidioms : Extracted and preprocessed using the `scrape_theidioms.ipynb` notebook.
 4. formal : https://github.com/prateeksaxena2809/EPIE_Corpus
+
+
+## Compute Resources Utilized
+
+For training and testing our models, we make use of the following compute resources:
+
+- **Specs:**
+  - Processor: 32 × 2 cores AMD EPYC 50375
+  - RAM: 1 TB
+  - GPUs: 8x NVIDIA A100 SXM4 80GB
