@@ -1,6 +1,6 @@
 # BERT-based Idiom Identification using Language Translation and Word Cohesion
 
-This repository is intended to provide a collection of the most important files related to the paper titled: 
+This repository is intended to provide a collection of a few of the files related to the paper titled: 
 "BERT-based Idiom Identification using Language Translation and Word Cohesion".
 
 ## src Directory
@@ -21,11 +21,11 @@ This folder contains subfolders containing the files for the `formal`, `magpie`,
 
 ## Datasets
 
-The datasets can be acquired as follows :
+The datasets are all publicly available and can be acquired as follows :
 
 *Note : some additional preprocessing will be required to exactly match our task*
 
 1. magpie : https://github.com/hslh/magpie-corpus
 2. VNC : http://www.natcorp.ox.ac.uk/
-3. theidioms : Extracted and preprocessed using the `scrape.ipynb` notebook.
+3. theidioms : Extracted and preprocessed using the `scrape_theidioms.ipynb` notebook.
 4. formal : https://github.com/prateeksaxena2809/EPIE_Corpus
