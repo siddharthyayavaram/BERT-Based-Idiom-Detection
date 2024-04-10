@@ -28,6 +28,7 @@ Run this command to install all required libraries
 ```bash
 pip install -r requirements.txt
 
+```
 ## src Directory
 
 ### Jupyter Notebooks:
