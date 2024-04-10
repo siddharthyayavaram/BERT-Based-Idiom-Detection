@@ -19,6 +19,14 @@ Our code relies on the following resources/libraries:
 - NLTK
 - spacy
 
+### Setup
+
+Python version used is Python 3.9.12
+
+Run this command to install are required libraries
+
+`pip install -r requirements.txt`
+
 ## src Directory
 
 ### Jupyter Notebooks:
