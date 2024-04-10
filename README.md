@@ -25,7 +25,8 @@ Python version used is Python 3.9.12
 
 Run this command to install all required libraries
 
-`pip install -r requirements.txt`
+```bash
+pip install -r requirements.txt
 
 ## src Directory
 
