@@ -70,3 +70,35 @@ For training and testing our models, we make use of the following compute resour
   - Processor: 32 × 2 cores AMD EPYC 50375
   - RAM: 1 TB
   - GPUs: 8x NVIDIA A100 SXM4 80GB
+
+
+## Citation
+
+If you find this work helpful for your research please consider citing the following bibtex entry.
+
+```
+@inproceedings{yayavaram-etal-2024-bert,
+    title = "{BERT}-based Idiom Identification using Language Translation and Word Cohesion",
+    author = "Yayavaram, Arnav  and
+      Yayavaram, Siddharth  and
+      Upadhyay, Prajna Devi  and
+      Das, Apurba",
+    editor = {Bhatia, Archna  and
+      Bouma, Gosse  and
+      Do{\u{g}}ru{\"o}z, A. Seza  and
+      Evang, Kilian  and
+      Garcia, Marcos  and
+      Giouli, Voula  and
+      Han, Lifeng  and
+      Nivre, Joakim  and
+      Rademaker, Alexandre},
+    booktitle = "Proceedings of the Joint Workshop on Multiword Expressions and Universal Dependencies (MWE-UD) @ LREC-COLING 2024",
+    month = may,
+    year = "2024",
+    address = "Torino, Italia",
+    publisher = "ELRA and ICCL",
+    url = "https://aclanthology.org/2024.mwe-1.26",
+    pages = "220--230",
+    abstract = "An idiom refers to a special type of multi-word expression whose meaning is figurative and cannot be deduced from the literal interpretation of its components. Idioms are prevalent in almost all languages and text genres, necessitating explicit handling by comprehensive NLP systems. Such phrases are referred to as Potentially Idiomatic Expressions (PIEs) and automatically identifying them in text is a challenging task. In this paper, we propose using a BERT-based model fine-tuned with custom objectives, to improve the accuracy of detecting PIEs in text. Our custom loss functions capture two important properties (word cohesion and language translation) to distinguish PIEs from non-PIEs. We conducted several experiments on 7 datasets and showed that incorporating custom objectives while training the model leads to substantial gains. Our models trained using this approach also have better sequence accuracy over DISC, a state-of-the-art PIE detection technique, along with good transfer capabilities.",
+}
+```
