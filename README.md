@@ -52,11 +52,10 @@ This folder contains subfolders containing the files for the `formal`, `magpie`,
 3. `list_of_idioms.txt`: A list of all 1606 idiomatic expressions which appear in the above datasets.
 4. `unfiltered_dict.json` : An unfiltered dictionary stored as a json file, with the idiom as the key corresponding to a list of sentences.
 
-*For access to the VNC dataset files, please contact f20213116@hyderabad.bits-pilani.ac.in via email*
-
 The remaining datasets are all publicly available and can be acquired as follows :
 
 *Note : some additional preprocessing will be required to exactly match our task*
+*For access to the VNC dataset files, please contact f20213116@hyderabad.bits-pilani.ac.in via email*
 
 1. magpie : https://github.com/hslh/magpie-corpus
 2. VNC : http://www.natcorp.ox.ac.uk/
