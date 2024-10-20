@@ -4,6 +4,8 @@ This repository is intended to provide a collection of the files related to the 
 
 "BERT-based Idiom Identification using Language Translation and Word Cohesion".
 
+which can be found [Here](https://aclanthology.org/2024.mwe-1.26.pdf)
+
 ### About the Project
 
 In this paper, we propose using a BERT- based model fine-tuned with the custom objectives to improve the accuracy of detecting PIEs in text. Our custom loss functions capture two important properties (word cohesion and language translation) to distinguish PIEs from non-PIEs. We conducted several experiments on 7 datasets and showed that incorporating custom objectives while training the model leads to substantial gains.
